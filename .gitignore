@@ -1,0 +1,12 @@
+.env
+__pycache__/
+*.pyc
+*.log
+node_modules/
+dist/
+build/
+postgres/data/
+redis/data/
+logs/
+.vscode/
+.idea/

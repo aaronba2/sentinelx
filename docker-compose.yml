@@ -1,0 +1,71 @@
+services:
+
+  postgres:
+    image: postgres:16
+    container_name: sentinelx-postgres
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - sentinelx-postgres-data:/var/lib/postgresql/data
+    networks:
+      - sentinelx-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: sentinelx-redis
+    restart: unless-stopped
+    volumes:
+      - sentinelx-redis-data:/data
+    networks:
+      - sentinelx-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    container_name: sentinelx-backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - sentinelx-network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend.Dockerfile
+    container_name: sentinelx-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - sentinelx-network
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: docker/dashboard.Dockerfile
+    container_name: sentinelx-dashboard
+    restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - sentinelx-network
+
+volumes:
+  sentinelx-postgres-data:
+  sentinelx-redis-data:
+
+networks:
+  sentinelx-network:
+    external: true
