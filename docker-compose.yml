@@ -48,6 +48,8 @@ services:
     restart: unless-stopped
     depends_on:
       - backend
+    ports:
+      - "5173:5173"
     networks:
       - sentinelx-network
 
@@ -59,9 +61,10 @@ services:
     restart: unless-stopped
     depends_on:
       - backend
+    ports:
+      - "5174:5173"
     networks:
       - sentinelx-network
-
 volumes:
   sentinelx-postgres-data:
   sentinelx-redis-data:
